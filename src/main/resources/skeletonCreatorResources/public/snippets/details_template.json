@@ -1,0 +1,28 @@
+{
+    "template" : true,
+    "type" : "wrapper",
+    "children" : [
+        {
+            "type" : "pageheader"
+        },
+        {
+            "type" : "container",
+            "children" : [
+            {
+                    "type" : "row",
+                    "children" : [
+                    {
+                        "type" : "column"
+                    },
+                    {
+                        "type" : "column"
+                    },
+                    {
+                        "type" : "column"
+                    }
+                ]
+            }
+            ]
+        }
+    ]
+}
