@@ -12,13 +12,12 @@
                     "type" : "row",
                     "children" : [
                     {
-                        "type" : "column"
-                    },
-                    {
-                        "type" : "column"
-                    },
-                    {
-                        "type" : "column"
+                        "type" : "panel",
+                        "children":[
+                            {
+                                "type":"formelement"
+                            }
+                        ]
                     }
                 ]
             }
