@@ -36,13 +36,6 @@ function init(){
         addNodeToTree('main');
     }
     var downloadLink = document.createElement("a");
-    if(downloadLink.download !== undefined){
-        downloadAvailable=true;
-    }else{
-        downloadAvailable=false;
-    }
-    $('.btn-download').hide();
-
 }
 
 function updateView() {
@@ -135,12 +128,12 @@ function searchNode(tree, parentNodeName){
 
 function validateFilenname(){
     var filename=$('#filename').val();
-    console.log(filename.match(/[0-9a-zA-Z]/));
 }
 
 function downloadSkeleton(){
     var filename=$('#filename').val();
     var html = renderHTML(tree._root);
+    $('#fileexistsCheck').prop('checked', false);
     var data = {};
     data.skeleton = html;
     data.filename = filename;
@@ -201,8 +194,9 @@ function selectCmp(nodeId, parentNodeId){
     $('.cmpCtn').removeClass('cmpCtn--active');
     $('.y-editor-builder').addClass('y-editor-builder--active');
     var viewportWidth = $(window).width();
-    if (viewportWidth < 1440) {
+    if (viewportWidth <= 1440) {
         $('.y-sidebar-right').addClass('y-settings--active');
+        $('.sidebar_mask').addClass('sidebar_mask--active');
     }
     var node = searchNode(tree._root, "" + nodeId);
     var nodeClass='.y-name-'+nodeId;
@@ -210,6 +204,9 @@ function selectCmp(nodeId, parentNodeId){
     if(node) {
         showSettings(node);
         $('#sidebar-tabs a[href="#settings"]').tab('show'); // Select tab by name
+    }else{
+        $('.y-sidebar-right').removeClass('y-settings--active');
+        $('.sidebar_mask').removeClass('sidebar_mask--active');
     }
 }
 
@@ -219,7 +216,7 @@ function showSettings(node) {
 
     var keys = Object.keys(tmpSettings);
     $('.y-settings').append("<h3>"+ node.type + "("+ node.id +")" +" - Settings</h3><br/>");
-
+    $('.y-sidebar_mask').addClass('y-sidebar_mask--active');
     if(keys.length > 0) {
 
         for(var i = 0; i < keys.length; i++) {
@@ -241,23 +238,19 @@ function showSettings(node) {
             node.settings = tmpSettings;
             updateView();
             $('#sidebar-tabs a[href="#components"]').tab('show');
-            var viewportWidth = $(window).width();
-            if (viewportWidth < 1440) {
-                $('.y-sidebar-right').removeClass('y-settings--active');
-            }
-            if (viewportWidth > 1440) {
-                $('.y-sidebar-right').removeClass('y-settings--active');
-            }
+            $('.y-sidebar-right').removeClass('y-settings--active');
+            $('.y-sidebar_mask').removeClass('y-sidebar_mask--active');
         });
     }
     else{
         $('.y-settings').append("<code style='margin-bottom:10px;'>Koi Säddings ahwähiläbbl!</code>");
         var viewportWidth = $(window).width();
-        if (viewportWidth < 1440) {
+        if (viewportWidth <= 1440) {
             $('.y-settings').append('<br><button class="btn btn-primary btn-lg btn-block settings-ok-button">OK</button>');
             $('.y-settings .btn').click(function() {
                 $('.y-sidebar-right').removeClass('y-settings--active');
                 $('.settings-ok-button').remove();
+                $('.y-sidebar_mask').removeClass('y-sidebar_mask--active');
             });
         }
     }
@@ -268,16 +261,10 @@ function preview() {
         $('.y-editor-builder').addClass('y-editor-builder--preview');
         $('.btn-preview .glyphicon').removeClass('glyphicon-eye-open');
         $('.btn-preview .glyphicon').addClass('glyphicon-eye-close');
-        $('.btn-trash').hide();
-        if(downloadAvailable){
-            $('.btn-download').show();
-        }
         $('#treeString').hide();
         editMode = false;
     }else{
         $('#treeString').show();
-        $('.btn-download').hide();
-        $('.btn-trash').show();
         $('.y-editor-builder').removeClass('y-editor-builder--preview');
         $('.btn-preview .glyphicon').removeClass('glyphicon-eye-close');
         $('.btn-preview .glyphicon').addClass('glyphicon glyphicon-eye-open');
@@ -339,6 +326,7 @@ function renderHTML(node, useEditMode){
                 }
             }else{
                 childrenHtml += renderHTML(node.children[i], useEditMode);
+                childrenHtml = childrenHtml.replace("{{GHOST_CMP}}", "");
             }
         }
 
@@ -366,54 +354,102 @@ function deleteDataModel(){
     addNodeToTree('main');
 }
 
-function isFileExists(){
-    var fileExistSpan = '<div class="help-block fileexists"><p>File already exists. Do you want to override it?</p></div>';
-    $('.form-group.downloadModal').addClass('has-error');
-    $('.form-group.downloadModal').append(fileExistSpan);
+function appendFileExistsCheckbox(filename){
+    if($('.file_exists_checkbox').length===0){
+        var fileName = filename?filename:"index";
+        var fileExistsCheckbox = '<div class="checkbox file_exists_checkbox"><input type="checkbox" id="fileexistsCheck" value="fileexistsCheck" onclick="overwriteFile()"><label for="fileexistsCheck" class="control-label">' + fileName + '.html already exists. Do you want to overwrite this file?</label></div>';
+        $('.form-group.downloadModal').append(fileExistsCheckbox);
+    }
 }
 
-function isNotValidFilename(){
-    var isNotValid = '<div class="help-block validation"><p>A valid filename is required</p></div>';
-    $('.form-group.downloadModal').addClass('has-error');
-    $('.form-group.downloadModal').append(isNotValid);
+function removeFileExistsCheckbox(){
+    $('.file_exists_checkbox').remove();
+}
+
+function overwriteFile(){
+    if($('#fileexistsCheck').is( ":checked" )){
+        $('#saveFileBtn').prop('disabled', false);
+    }else{
+        $('#saveFileBtn').prop('disabled', true);
+    }
+}
+
+function appendNotValidFilenameMsg(){
+    if($('.validation').length===0){
+        var isNotValid = '<div class="help-block validation"><p>A valid filename is required</p></div>';
+        $('.form-group.downloadModal').addClass('has-error');
+        $('.form-group.downloadModal').append(isNotValid);
+    }
+}
+
+function checkFileExists(name, callback){
+    $.ajax({
+        method: "POST",
+        contentType: "application/json",
+        url: 'http://localhost:8082/checkFilename',
+        data: JSON.stringify({filename:name}),
+        success: function(data){
+            callback(data==="exist");
+        },
+        dataType: 'html'
+    });
+}
+
+function removeErrorMsg(input){
+    input.removeClass("invalid").addClass("valid");
+    $('.validation').remove();
+    $('.form-group.downloadModal').removeClass('has-error');
+}
+
+function addErrorMsg(input){
+    input.removeClass("valid").addClass("invalid");
+    appendNotValidFilenameMsg();
+}
+
+function openSaveModal(){
+    $('#filename').trigger('input');
+    $('#myModal').modal('show');
 }
 
 $(document).ready(function() {
     init();
-    $('#saveFileBtn').prop('disabled', false);
-    isFileExists();
     $('#filename').on('input', function() {
         var input=$(this);
         var re =/^[a-zA-Z0-9_]+$/;
         var is_filename=re.test(input.val());
         if(is_filename){
-            var data = {};
-            data.filename = input.val();
-            $.ajax({
-                method: "POST",
-                contentType: "application/json",
-                url: 'http://localhost:8082/checkFilename',
-                data: JSON.stringify(data),
-                success: function(data){
-                    if(data==='exist'){
-                        isFileExists();
-                    }else{
-                        $('.fileexists').remove();
-                    }
-                },
-                dataType: 'html'
-            });
+            checkFileExists(input.val(),function(exists){
+                if(exists){
+                    appendFileExistsCheckbox(input.val());
 
-            input.removeClass("invalid").addClass("valid");
-            $('.validation').remove();
-            $('.form-group.downloadModal').removeClass('has-error');
-            $('#saveFileBtn').prop('disabled', false);
+                    $('#saveFileBtn').prop('disabled', true);
+                    if($('.file_exists_checkbox').is( ":checked" )){
+                        $('#saveFileBtn').prop('disabled', false);
+                    }
+                }else{
+                    removeFileExistsCheckbox();
+
+                    $('#saveFileBtn').prop('disabled', false);
+                }
+                removeErrorMsg(input);
+            });
         }else{
-            input.removeClass("valid").addClass("invalid");
-            if($('.validation').length===0){
-                isNotValidFilename();
-            }
+            removeFileExistsCheckbox();
+            addErrorMsg(input);
             $('#saveFileBtn').prop('disabled', true);
         }
     });
+
+    $('.y-sidebar_mask').click(function(e){
+        $('.y-sidebar_mask').removeClass('y-sidebar_mask--active');
+        $('.y-sidebar-right').removeClass('y-settings--active');
+    });
+});
+
+$(window).resize(function() {
+    var viewportWidth = $(window).width();
+    if (viewportWidth > 1440) {
+        $('.y-sidebar_mask').removeClass('y-sidebar_mask--active');
+        $('.y-sidebar-right').removeClass('y-settings--active');
+    }
 });

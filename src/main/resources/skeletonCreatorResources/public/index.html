@@ -58,18 +58,13 @@
                 <div class="container-fluid">
                     <div class="navbar-left">
                         <div class="y-headline">
-                            <h1>The Skeletor</h1>
+                            <h1>The Skeleton Creator</h1>
                         </div>
                     </div>
                     <div class="navbar-right">
                         <div class="y-toolbar">
-                            <div class="y-toolbar-cell">
-                                <button class="btn btn-link btn-lg navbar-btn btn-trash" onclick="deleteDataModel()" title="delete view">
-                                    <span class="glyphicon glyphicon-trash"></span>
-                                </button>
-                            </div>
                              <div class="y-toolbar-cell">
-                                    <button type="button" class="btn btn-link btn-lg navbar-btn btn-download" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-download-alt"></span></button>
+                                    <button type="button" class="btn btn-link btn-lg navbar-btn btn-download"  onclick="openSaveModal()"><span class="glyphicon glyphicon-download-alt"></span></button>
                             </div>
                             <div class="y-toolbar-cell">
                                 <button class="btn btn-link btn-lg navbar-btn btn-preview" onclick="preview()" title="view preview">
@@ -80,6 +75,11 @@
                                 <button class="btn btn-link btn-lg navbar-btn" onclick="showHTMLCode()" title="show html code">
                                     <span class="glyphicon glyphicon-menu-left"></span>
                                     <span class="glyphicon glyphicon-menu-right"></span>
+                                </button>
+                            </div>
+                            <div class="y-toolbar-cell">
+                                <button class="btn btn-link btn-lg navbar-btn btn-trash" onclick="deleteDataModel()" title="delete view">
+                                    <span class="glyphicon glyphicon-trash"></span>
                                 </button>
                             </div>
                         </div>
@@ -155,7 +155,7 @@
                     <div class="y-sidebar-header">
                         <h3>Settings</h3>
                     </div>
-                    <div role="tabpanel" class="tab-panel" id="settings">
+                    <div class="y-settings-content" id="settings">
                         <div class="y-settings"></div>
                     </div>
                 </div>
@@ -182,5 +182,6 @@
                 </div>
             </div>
         </div>
+        <div class="y-sidebar_mask"></div>
     </body>
 </html>
