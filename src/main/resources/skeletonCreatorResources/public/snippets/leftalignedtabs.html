@@ -4,17 +4,13 @@
 
 
 <div class="tab-content">
-  {{SLOT1}}//foreach do
+  {{SLOT1}}
 </div>
 
 <script id="toremove">
-  $(".y-editor-builder .tab-content .tab-pane").each(function (index, elem) {
-    console.log(elem.id);
-    $(elem.closest(".tab-content")).prev().append('<li role="presentation">' +
-      ' <a href="#' + elem.id + '" role="tab" data-toggle="tab">' + elem.id + '</a></li>')
+  $(".y-content .tab-content .tab-pane").each(function (index, elem) {
+    $(elem.closest(".tab-content")).prev().append('<li role="presentation"><a href="#' + elem.id + '" role="tab" data-toggle="tab">' + elem.id + '</a></li>')
   });
-  setTimeout(function(){
-    $('#toremove').remove();
-  },10);
+  $('#toremove').remove();
 
 </script>

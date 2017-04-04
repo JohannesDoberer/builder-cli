@@ -3,6 +3,8 @@ var nodeIndex = 0;
 var editMode = true;
 var tmpCmp;
 var downloadAvailable = false;
+var fileName;
+var fileExistsCheckbox;
 
 var rootNode = {
     "name": "rootNode",
@@ -273,14 +275,30 @@ function preview() {
 }
 
 function showHTMLCode(){
-    $('.y-code-inspector').addClass('y-code-inspector--active');
-    $('.y-code-inspector .y-code-inspector-content').text(renderHTML(tree._root));
-    hljs.initHighlighting.called = false;
-    hljs.initHighlighting();
+    generateIFrame(function(html){
+        $('.y-code-inspector').addClass('y-code-inspector--active');
+        $('.y-code-inspector .y-code-inspector-content').text(html);
+        hljs.initHighlighting.called = false;
+        hljs.initHighlighting();
+    });
+
+}
+
+function generateIFrame(callback){
+    $('#body').append("<iframe height='1px' width='1px' id='previewIframe'></iframe>");
+    var doc = $('#previewIframe').get(0).contentWindow.document;
+    doc.open();
+    doc.write(renderHTML(tree._root));
+    doc.close();
+
+    $('#previewIframe').on('load', function(){
+        callback($('#previewIframe').get(0).contentWindow.document.documentElement.outerHTML);
+    });
 }
 
 function closeHTMLCode(){
     $('.y-code-inspector').removeClass('y-code-inspector--active');
+    $('#previewIframe').remove();
 }
 
 function renderHTML(node, useEditMode){
@@ -327,6 +345,7 @@ function renderHTML(node, useEditMode){
             }else{
                 childrenHtml += renderHTML(node.children[i], useEditMode);
                 childrenHtml = childrenHtml.replace("{{GHOST_CMP}}", "");
+
             }
         }
 
@@ -341,6 +360,7 @@ function renderHTML(node, useEditMode){
         }
 
         $('.y-editor-builder').removeClass('y-editor-builder--active');
+
         return html;
     }
 }
@@ -355,11 +375,16 @@ function deleteDataModel(){
 }
 
 function appendFileExistsCheckbox(filename){
-    if($('.file_exists_checkbox').length===0){
-        var fileName = filename?filename:"index";
-        var fileExistsCheckbox = '<div class="checkbox file_exists_checkbox"><input type="checkbox" id="fileexistsCheck" value="fileexistsCheck" onclick="overwriteFile()"><label for="fileexistsCheck" class="control-label">' + fileName + '.html already exists. Do you want to overwrite this file?</label></div>';
-        $('.form-group.downloadModal').append(fileExistsCheckbox);
-    }
+    checkFileExists(filename, function(exist){
+        if(exist){
+            if(fileName!==filename){
+                removeFileExistsCheckbox();
+            }
+            fileName = filename?filename:"index";
+            fileExistsCheckbox = '<div class="checkbox file_exists_checkbox"><input type="checkbox" id="fileexistsCheck" value="fileexistsCheck" onclick="overwriteFile()"><label for="fileexistsCheck" class="control-label">' + fileName + '.html already exists. Do you want to overwrite this file?</label></div>';
+            $('.form-group.downloadModal').append(fileExistsCheckbox);
+        }
+    });
 }
 
 function removeFileExistsCheckbox(){
