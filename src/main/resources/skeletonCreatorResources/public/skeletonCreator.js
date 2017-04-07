@@ -264,8 +264,21 @@ function preview() {
         $('.btn-preview .glyphicon').removeClass('glyphicon-eye-open');
         $('.btn-preview .glyphicon').addClass('glyphicon-eye-close');
         $('#treeString').hide();
+
+        // $('.previewIframe').css('visibility', 'visible');
+        // $('previewIframe').show();
+        // var doc = $('#previewIframe').get(0).contentWindow.document;
+        // doc.open();
+        // doc.write(renderHTML(tree._root));
+        // doc.close();
+
+        // $('#previewIframe').on('load', function(){
+        //     $('#previewIframe').get(0).contentWindow.document.documentElement.outerHTML;
+        // });
         editMode = false;
     }else{
+        // $('#preview').show();
+        // $('.previewIframe').css('visibility', 'hidden');
         $('#treeString').show();
         $('.y-editor-builder').removeClass('y-editor-builder--preview');
         $('.btn-preview .glyphicon').removeClass('glyphicon-eye-close');
@@ -276,6 +289,7 @@ function preview() {
 
 function showHTMLCode(){
     generateIFrame(function(html){
+        console.log('typeof: ' + typeof html);
         $('.y-code-inspector').addClass('y-code-inspector--active');
         $('.y-code-inspector .y-code-inspector-content').text(html);
         hljs.initHighlighting.called = false;
@@ -284,21 +298,8 @@ function showHTMLCode(){
 
 }
 
-function generateIFrame(callback){
-    $('#body').append("<iframe height='1px' width='1px' id='previewIframe'></iframe>");
-    var doc = $('#previewIframe').get(0).contentWindow.document;
-    doc.open();
-    doc.write(renderHTML(tree._root));
-    doc.close();
-
-    $('#previewIframe').on('load', function(){
-        callback($('#previewIframe').get(0).contentWindow.document.documentElement.outerHTML);
-    });
-}
-
 function closeHTMLCode(){
     $('.y-code-inspector').removeClass('y-code-inspector--active');
-    $('#previewIframe').remove();
 }
 
 function renderHTML(node, useEditMode){
@@ -326,11 +327,10 @@ function renderHTML(node, useEditMode){
         var childrenHtml ="";
         for(var i = 0; i < node.children.length; i++) {
             if(useEditMode){
-                if(node.children[i].settings.SHOW_CMP_CTN !== false) {
-                    childrenHtml += '<div class="cmpCtn y-name-'+ node.children[i].id+'" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><div class="cmp-ghost"></div>';
-                    childrenHtml += '<button class="btn btn-link cmp-btn" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="hyicon hyicon-remove"></span>';
-
-                    childrenHtml += '</button>';
+                if(node.children[i].settings.SHOW_CMP_CTN !== 'false') {
+                    childrenHtml += '<div class="cmpCtn y-name-'+ node.children[i].id+'"><div class="cmp-ghost"></div>';
+                    childrenHtml += '<button class="btn btn-link cmp-btn__settings" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
+                    childrenHtml += '<button class="btn btn-link cmp-btn__delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="hyicon hyicon-remove"></span></button>';
                     childrenHtml += renderHTML(node.children[i], useEditMode);
 
                     childrenHtml += '</div>';
