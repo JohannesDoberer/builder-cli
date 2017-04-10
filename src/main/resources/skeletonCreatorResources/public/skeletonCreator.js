@@ -329,17 +329,21 @@ function renderHTML(node, useEditMode){
             if(useEditMode){
                 if(node.children[i].settings.SHOW_CMP_CTN !== 'false') {
                     childrenHtml += '<div class="cmpCtn y-name-'+ node.children[i].id+'"><div class="cmp-ghost"></div>';
+                    childrenHtml += '<div class="button-container">';
                     childrenHtml += '<button class="btn btn-link cmp-btn__settings" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
                     childrenHtml += '<button class="btn btn-link cmp-btn__delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="hyicon hyicon-remove"></span></button>';
+                    childrenHtml +='</div>';
                     childrenHtml += renderHTML(node.children[i], useEditMode);
 
                     childrenHtml += '</div>';
                 } else {
                     childrenHtml += renderHTML(node.children[i], useEditMode);
 
-                    var ghostHtml = '<div style="width:100%; height: 100%; position: absolute" class="cmpCtn y-name-'+ node.children[i].id+'" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><div class="cmp-ghost"></div>';
-                    ghostHtml += '<button class="btn btn-link cmp-btn" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="hyicon hyicon-remove"></span>';
-                    ghostHtml += '</button></div>';
+                    var ghostHtml = '<div style="width:100%; height: 100%; position: absolute" class="cmpCtn y-name-'+ node.children[i].id+'" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;">'
+                    ghostHtml += '<div class="cmp-ghost"></div>';
+                    ghostHtml += '<div class"button-container">';
+                    ghostHtml += '<button class="btn btn-link cmp-btn" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="hyicon hyicon-remove"></span></button>';
+                    ghostHtml += '</div></div>';
                     childrenHtml = childrenHtml.replace("{{GHOST_CMP}}", ghostHtml);
                 }
             }else{

@@ -26,32 +26,25 @@
 .y-editor-builder .cmpCtn--active{
     border-color: #18bc33;
 }
-.cmpCtn .cmp-btn__settings{
+
+.cmpCtn .button-container{
     display: none;
     position: absolute;
     background: #fff;
-    border: 2px solid currentColor;
-    border-right: none;
-    border-top: none;
-    top:0;
-    right:48px;
-}
-
-
-.cmpCtn .cmp-btn__delete{
-    display: none;
-    position: absolute;
-    background: #fff;
-    border: 2px solid currentColor;
+    /*border: 2px solid currentColor;*/
     border-right: none;
     border-top: none;
     top:0;
     right:0;
 }
 
-
 .sk-top-nav{
     z-index:2001;
+}
+
+.cmpCtn:hover > .button-container{
+    display: block;
+
 }
 
 .cmpCtn:hover > .cmp-ghost{
@@ -80,24 +73,18 @@
     opacity: 1;
 }
 
-.cmp-ghost:hover ~ .cmp-btn__delete{
+.cmp-ghost:hover + .button-container{
     display:block;
     z-index: 2000;
 }
 
-.cmp-ghost:hover ~ .cmp-btn__settings{
-    display:block;
-    z-index: 2000;
+.cmp-btn__settings {
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    border-left: 2px solid currentColor;
 }
-
-.cmp-btn__settings:hover{
-    display: block;
-    z-index: 2000;
-}
-
-.cmp-btn__delete:hover{
-    display: block;
-    z-index: 2000;
+.cmp-btn__delete{
+    border-bottom: 2px solid currentColor;
 }
 
 .y-sidebar{
@@ -210,8 +197,7 @@
     display: none;
 }
 
-.y-editor-builder--preview .cmp-btn__delete,
-.y-editor-builder--preview .cmp-btn__settings,
+.y-editor-builder--preview .button-container,
 .y-editor-builder--preview .cmp-ghost{
     display: none!important;
 }
