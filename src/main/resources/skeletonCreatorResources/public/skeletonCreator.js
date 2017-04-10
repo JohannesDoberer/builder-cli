@@ -331,8 +331,8 @@ function renderHTML(node, useEditMode){
                     childrenHtml += '<div class="cmpCtn y-name-'+ node.children[i].id+'"><div class="cmp-ghost"></div>';
                     childrenHtml += '<div class="button-container">';
                     childrenHtml += '<button class="btn btn-link cmp-btn__settings" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
-                    childrenHtml += '<button class="btn btn-link cmp-btn__delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="hyicon hyicon-remove"></span></button>';
-                    childrenHtml +='</div>';
+                    childrenHtml += '<button class="btn btn-link cmp-btn__delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="glyphicon glyphicon-remove"></span></button>';
+                    childrenHtml +='</div><div class="cmp-brandloch"></div>';
                     childrenHtml += renderHTML(node.children[i], useEditMode);
 
                     childrenHtml += '</div>';
