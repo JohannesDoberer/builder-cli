@@ -52,6 +52,12 @@
     display: block;
 }
 
+.cmpCtn .test{
+    border: none;
+    padding: 20px 10px 22px;
+    background: transparent !important;
+}
+
 /* Add a white background to siblings to proper hightlight stuff with transparent background */
 .cmpCtn:hover .cmpCtn,
 .cmpCtn:hover .y-dropzone{
@@ -84,7 +90,6 @@
     display:block;
         z-index: 4000;
 }
-
 
 .cmp-btn__settings:hover,
 .cmp-btn__delete:hover{

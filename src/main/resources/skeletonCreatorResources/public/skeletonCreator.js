@@ -38,6 +38,7 @@ function init(){
         addNodeToTree('main');
     }
     var downloadLink = document.createElement("a");
+    styleGhostCmpSlot();
 }
 
 function updateView() {
@@ -45,6 +46,7 @@ function updateView() {
         $("#treeString").empty().append(JSON.stringify(tree, null, 4).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;"));
         $("#preview").empty().append(renderHTML(tree._root, editMode));
         localStorage.setItem('dataModel', JSON.stringify(tree));
+        styleGhostCmpSlot();
     }
     else {
         var $body = $('body', $("#preview").get(0).contentWindow.document);
@@ -240,8 +242,7 @@ function showSettings(node) {
             node.settings = tmpSettings;
             updateView();
             $('#sidebar-tabs a[href="#components"]').tab('show');
-            $('.y-sidebar-right').removeClass('y-settings--active');
-            $('.y-sidebar_mask').removeClass('y-sidebar_mask--active');
+            removeActiveSidebarClasses();
         });
     }
     else{
@@ -250,12 +251,16 @@ function showSettings(node) {
         if (viewportWidth <= 1440) {
             $('.y-settings').append('<br><button class="btn btn-primary btn-lg btn-block settings-ok-button">OK</button>');
             $('.y-settings .btn').click(function() {
-                $('.y-sidebar-right').removeClass('y-settings--active');
                 $('.settings-ok-button').remove();
-                $('.y-sidebar_mask').removeClass('y-sidebar_mask--active');
+                removeActiveSidebarClasses();
             });
         }
     }
+}
+
+function removeActiveSidebarClasses(){
+    $('.y-sidebar-right').removeClass('y-settings--active');
+    $('.y-sidebar_mask').removeClass('y-sidebar_mask--active');
 }
 
 function preview() {
@@ -264,32 +269,20 @@ function preview() {
         $('.btn-preview .glyphicon').removeClass('glyphicon-eye-open');
         $('.btn-preview .glyphicon').addClass('glyphicon-eye-close');
         $('#treeString').hide();
-
-        // $('.previewIframe').css('visibility', 'visible');
-        // $('previewIframe').show();
-        // var doc = $('#previewIframe').get(0).contentWindow.document;
-        // doc.open();
-        // doc.write(renderHTML(tree._root));
-        // doc.close();
-
-        // $('#previewIframe').on('load', function(){
-        //     $('#previewIframe').get(0).contentWindow.document.documentElement.outerHTML;
-        // });
+        removeStyleGhostCmpSlot();
         editMode = false;
     }else{
-        // $('#preview').show();
-        // $('.previewIframe').css('visibility', 'hidden');
         $('#treeString').show();
         $('.y-editor-builder').removeClass('y-editor-builder--preview');
         $('.btn-preview .glyphicon').removeClass('glyphicon-eye-close');
         $('.btn-preview .glyphicon').addClass('glyphicon glyphicon-eye-open');
+        styleGhostCmpSlot();
         editMode = true;
     }
 }
 
 function showHTMLCode(){
     generateIFrame(function(html){
-        console.log('typeof: ' + typeof html);
         $('.y-code-inspector').addClass('y-code-inspector--active');
         $('.y-code-inspector .y-code-inspector-content').text(html);
         hljs.initHighlighting.called = false;
@@ -298,8 +291,24 @@ function showHTMLCode(){
 
 }
 
+function generateIFrame(callback){
+    $('#body').append("<iframe height='1px' width='1px' id='previewIframe'></iframe>");
+    var doc = $('#previewIframe').get(0).contentWindow.document;
+    doc.open();
+    doc.write(renderHTML(tree._root));
+    doc.close();
+
+    $('#previewIframe').on('load', function(){
+        setTimeout(function(){
+            callback($('#previewIframe').get(0).contentWindow.document.documentElement.outerHTML);
+        },100);
+    });
+}
+
 function closeHTMLCode(){
     $('.y-code-inspector').removeClass('y-code-inspector--active');
+    $('#previewIframe').remove();
+
 }
 
 function renderHTML(node, useEditMode){
@@ -331,7 +340,7 @@ function renderHTML(node, useEditMode){
                     childrenHtml += '<div class="cmpCtn y-name-'+ node.children[i].id+'"><div class="cmp-ghost"></div>';
                     childrenHtml += '<div class="button-container">';
                     childrenHtml += '<button class="btn btn-link cmp-btn__settings" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
-                    childrenHtml += '<button class="btn btn-link cmp-btn__delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="glyphicon glyphicon-remove"></span></button>';
+                    childrenHtml += '<button class="btn btn-link cmp-btn__delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="glyphicon glyphicon-trash"></span></button>';
                     childrenHtml +='</div><div class="cmp-brandloch"></div>';
                     childrenHtml += renderHTML(node.children[i], useEditMode);
 
@@ -339,10 +348,11 @@ function renderHTML(node, useEditMode){
                 } else {
                     childrenHtml += renderHTML(node.children[i], useEditMode);
 
-                    var ghostHtml = '<div style="width:100%; height: 100%; position: absolute" class="cmpCtn y-name-'+ node.children[i].id+'" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;">'
+                    var ghostHtml = '<div class="cmpCtn test y-name-'+ node.children[i].id+'">';
                     ghostHtml += '<div class="cmp-ghost"></div>';
-                    ghostHtml += '<div class"button-container">';
-                    ghostHtml += '<button class="btn btn-link cmp-btn" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="hyicon hyicon-remove"></span></button>';
+                    ghostHtml += '<div class="button-container">';
+                    ghostHtml += '<button class="btn btn-link cmp-btn__settings" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
+                    ghostHtml += '<button class="btn btn-link cmp-btn__delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="glyphicon glyphicon-trash"></span></button>';
                     ghostHtml += '</div></div>';
                     childrenHtml = childrenHtml.replace("{{GHOST_CMP}}", ghostHtml);
                 }
@@ -438,6 +448,14 @@ function addErrorMsg(input){
 function openSaveModal(){
     $('#filename').trigger('input');
     $('#myModal').modal('show');
+}
+
+function styleGhostCmpSlot(){
+    $('.test').parent().css({"border-color": "#0486e0", "border-width":"2px", "border-style":"solid"});
+}
+
+function removeStyleGhostCmpSlot(){
+    $('.test').parent().css({"border":"none"});
 }
 
 $(document).ready(function() {

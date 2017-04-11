@@ -9,6 +9,7 @@
 
 <script id="toremove">
   $(".tab-content .tab-pane").each(function (index, elem) {
+    console.log('test');
     $(elem.closest(".tab-content")).prev().append('<li role="presentation"><a href="#' + elem.id + '" role="tab" data-toggle="tab">' + elem.id + '</a></li>')
   });
   $('#toremove').remove();
