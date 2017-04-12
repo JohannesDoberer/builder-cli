@@ -1,39 +1,14 @@
  <ul class="nav nav-tabs nav-tabs--responsive nav-tabs--center" role="tablist" id="demo-tabs2">
-   <li role="presentation">
-     <a href="#home2" role="tab" data-toggle="tab">{{SETTINGS.CENTERED_TABS1}}</a>
-   </li>
-   <li role="presentation" class="active">
-     <a href="#profile2" role="tab" data-toggle="tab">{{SETTINGS.CENTERED_TABS2}}</a>
-   </li>
-   <li role="presentation">
-     <a href="#account2" role="tab" data-toggle="tab">{{SETTINGS.CENTERED_TABS3}}</a>
-   </li>
-   <li role="presentation">
-     <a href="#settings2" role="tab" data-toggle="tab">{{SETTINGS.CENTERED_TABS4}}</a>
-   </li>
-   <li class="nav-tabs-mobile-caret" data-toggle="dropdown" data-target="#demotabs">
-     <a class="pull-right" href="#"><span class="caret"></span></a>
-   </li>
+
  </ul>
  <div class="tab-content">
-   <div role="tabpanel" class="tab-pane" id="home2">
-     <p>
-       {{SETTINGS.CENTERED_TABSCONTENT1}}
-     </p>
-   </div>
-   <div role="tabpanel" class="tab-pane active" id="profile2">
-     <p>
-       {{SETTINGS.CENTERED_TABSCONTENT2}}
-     </p>
-   </div>
-   <div role="tabpanel" class="tab-pane" id="account2">
-     <p>
-      {{SETTINGS.CENTERED_TABSCONTENT3}}
-     </p>
-   </div>
-   <div role="tabpanel" class="tab-pane" id="settings2">
-     <p>
-      {{SETTINGS.CENTERED_TABSCONTENT4}}
-     </p>
-   </div>
+   {{SLOT1}}
  </div>
+
+ <script id="toRemoveCentered">
+  $(".tab-content .tab-pane").each(function (index, elem) {
+    $(elem.closest(".tab-content")).prev().append('<li role="presentation"><a href="#' + elem.id + '" role="tab" data-toggle="tab">' + elem.id + '</a></li>')
+  });
+  $('#toRemoveCentered').remove();
+
+</script>

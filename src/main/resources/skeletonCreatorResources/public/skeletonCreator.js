@@ -195,6 +195,7 @@ function removeNode(nodeName, parentNode){
 }
 
 function selectCmp(nodeId, parentNodeId){
+    removeStyleGhostCmpSlot();//special, when you have ghost-cmp
     $('.cmpCtn').removeClass('cmpCtn--active');
     $('.y-editor-builder').addClass('y-editor-builder--active');
     var viewportWidth = $(window).width();
@@ -204,7 +205,11 @@ function selectCmp(nodeId, parentNodeId){
     }
     var node = searchNode(tree._root, "" + nodeId);
     var nodeClass='.y-name-'+nodeId;
-    $(nodeClass).addClass('cmpCtn--active');
+    if($(nodeClass).hasClass('ghostflag')){
+        $(nodeClass).parent().css({"border-color": "#18bc33", "border-width":"2px", "border-style":"solid"});
+    }else{
+        $(nodeClass).addClass('cmpCtn--active');
+    }
     if(node) {
         showSettings(node);
         $('#sidebar-tabs a[href="#settings"]').tab('show'); // Select tab by name
@@ -348,7 +353,7 @@ function renderHTML(node, useEditMode){
                 } else {
                     childrenHtml += renderHTML(node.children[i], useEditMode);
 
-                    var ghostHtml = '<div class="cmpCtn test y-name-'+ node.children[i].id+'">';
+                    var ghostHtml = '<div class="cmpCtn ghostflag y-name-'+ node.children[i].id+'">';
                     ghostHtml += '<div class="cmp-ghost"></div>';
                     ghostHtml += '<div class="button-container">';
                     ghostHtml += '<button class="btn btn-link cmp-btn__settings" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
@@ -450,12 +455,24 @@ function openSaveModal(){
     $('#myModal').modal('show');
 }
 
+//wrapp ghostCmp+Slot
 function styleGhostCmpSlot(){
-    $('.test').parent().css({"border-color": "#0486e0", "border-width":"2px", "border-style":"solid"});
+    $('.ghostflag').parent().css({"border-color": "#0486e0", "border-width":"2px", "border-style":"solid"});
 }
 
 function removeStyleGhostCmpSlot(){
-    $('.test').parent().css({"border":"none"});
+    $('.ghostflag').parent().css({"border":"none"});
+}
+
+function handleHoverOnGhostCmpSlot(){
+    $('.ghostflag').hover(
+        function(){
+            styleGhostCmpSlot();
+        },
+        function(){
+            removeStyleGhostCmpSlot();
+        }
+    );
 }
 
 $(document).ready(function() {
@@ -491,6 +508,8 @@ $(document).ready(function() {
         $('.y-sidebar_mask').removeClass('y-sidebar_mask--active');
         $('.y-sidebar-right').removeClass('y-settings--active');
     });
+
+    handleHoverOnGhostCmpSlot();
 });
 
 $(window).resize(function() {
