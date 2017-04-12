@@ -42,23 +42,10 @@ function init(){
 }
 
 function updateView() {
-    if(editMode) {
         $("#treeString").empty().append(JSON.stringify(tree, null, 4).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;"));
         $("#preview").empty().append(renderHTML(tree._root, editMode));
         localStorage.setItem('dataModel', JSON.stringify(tree));
         styleGhostCmpSlot();
-    }
-    else {
-        var $body = $('body', $("#preview").get(0).contentWindow.document);
-        $body.html(renderHTML(tree._root, editMode));
-        var iframe = document.getElementById('preview');
-        if(iframe){
-            var frameDoc = iframe.contentDocument || iframe.contentWindow.document;
-            if(frameDoc){
-                var el = frameDoc.getElementById('slot1');
-            }
-        }
-    }
 }
 
 function createFromTemplate(parentNodeName, typeTree, callback) {
@@ -194,9 +181,9 @@ function removeNode(nodeName, parentNode){
     }
 }
 
-function selectCmp(nodeId, parentNodeId){
+function selectComponent(nodeId, parentNodeId){
     removeStyleGhostCmpSlot();//special, when you have ghost-cmp
-    $('.cmpCtn').removeClass('cmpCtn--active');
+    $('.component-container').removeClass('component-container--active');
     $('.y-editor-builder').addClass('y-editor-builder--active');
     var viewportWidth = $(window).width();
     if (viewportWidth <= 1440) {
@@ -208,7 +195,7 @@ function selectCmp(nodeId, parentNodeId){
     if($(nodeClass).hasClass('ghostflag')){
         $(nodeClass).parent().css({"border-color": "#18bc33", "border-width":"2px", "border-style":"solid"});
     }else{
-        $(nodeClass).addClass('cmpCtn--active');
+        $(nodeClass).addClass('component-container--active');
     }
     if(node) {
         showSettings(node);
@@ -276,6 +263,7 @@ function preview() {
         $('#treeString').hide();
         removeStyleGhostCmpSlot();
         editMode = false;
+        $('.btn-trash').hide();
     }else{
         $('#treeString').show();
         $('.y-editor-builder').removeClass('y-editor-builder--preview');
@@ -283,6 +271,7 @@ function preview() {
         $('.btn-preview .glyphicon').addClass('glyphicon glyphicon-eye-open');
         styleGhostCmpSlot();
         editMode = true;
+        $('.btn-trash').show();
     }
 }
 
@@ -342,10 +331,11 @@ function renderHTML(node, useEditMode){
         for(var i = 0; i < node.children.length; i++) {
             if(useEditMode){
                 if(node.children[i].settings.SHOW_CMP_CTN !== 'false') {
-                    childrenHtml += '<div class="cmpCtn y-name-'+ node.children[i].id+'"><div class="cmp-ghost"></div>';
+                    childrenHtml += '<div class="component-container y-name-'+ node.children[i].id+'">';
+                    childrenHtml += '<div class="ghost-component"></div>';
                     childrenHtml += '<div class="button-container">';
-                    childrenHtml += '<button class="btn btn-link cmp-btn__settings" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
-                    childrenHtml += '<button class="btn btn-link cmp-btn__delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="glyphicon glyphicon-trash"></span></button>';
+                    childrenHtml += '<button class="btn btn-link component-btn-settings" onclick="selectComponent(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
+                    childrenHtml += '<button class="btn btn-link component-btn-delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="glyphicon glyphicon-trash"></span></button>';
                     childrenHtml +='</div><div class="cmp-brandloch"></div>';
                     childrenHtml += renderHTML(node.children[i], useEditMode);
 
@@ -353,11 +343,11 @@ function renderHTML(node, useEditMode){
                 } else {
                     childrenHtml += renderHTML(node.children[i], useEditMode);
 
-                    var ghostHtml = '<div class="cmpCtn ghostflag y-name-'+ node.children[i].id+'">';
-                    ghostHtml += '<div class="cmp-ghost"></div>';
+                    var ghostHtml = '<div class="component-container ghostflag y-name-'+ node.children[i].id+'">';
+                    ghostHtml += '<div class="ghost-component"></div>';
                     ghostHtml += '<div class="button-container">';
-                    ghostHtml += '<button class="btn btn-link cmp-btn__settings" onclick="selectCmp(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
-                    ghostHtml += '<button class="btn btn-link cmp-btn__delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="glyphicon glyphicon-trash"></span></button>';
+                    ghostHtml += '<button class="btn btn-link component-btn-settings" onclick="selectComponent(' + node.children[i].id + ','+ node.id + '); event.stopPropagation(); return false;"><span class="glyphicon glyphicon-pencil"></span></button>';
+                    ghostHtml += '<button class="btn btn-link component-btn-delete" onclick="removeNode(' + node.children[i].id + ','+ node.id + ')"><span class="glyphicon glyphicon-trash"></span></button>';
                     ghostHtml += '</div></div>';
                     childrenHtml = childrenHtml.replace("{{GHOST_CMP}}", ghostHtml);
                 }
@@ -375,7 +365,7 @@ function renderHTML(node, useEditMode){
         if(useEditMode && node.type==="main") {
             html = childrenHtml;
         } else {
-            html = html.replace("{{SLOT1}}", childrenHtml);
+            html = html.replace("{{SLOT}}", childrenHtml);
         }
 
         $('.y-editor-builder').removeClass('y-editor-builder--active');
@@ -455,7 +445,7 @@ function openSaveModal(){
     $('#myModal').modal('show');
 }
 
-//wrapp ghostCmp+Slot
+//wrapp ghostComponent+Slot
 function styleGhostCmpSlot(){
     $('.ghostflag').parent().css({"border-color": "#0486e0", "border-width":"2px", "border-style":"solid"});
 }

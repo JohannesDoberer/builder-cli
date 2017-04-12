@@ -1,8 +1,4 @@
-.previewCtn{
-    width:50%;
-    height:600px;
-}
-.cmpCtn{
+.component-container{
     position: relative;
     top: 0;
     left: 0;
@@ -13,21 +9,21 @@
 }
 
 /* If one component is selected grey out the others */
-.y-editor-builder--active .cmpCtn{
+.y-editor-builder--active .component-container{
     border-color: rgba(95, 112, 132, 0.2);
 }
 
 /* If one component is selected highlight none selected only on hover */
-.y-editor-builder--active .cmpCtn:hover{
+.y-editor-builder--active .component-container:hover{
     border-color: #0486e0;
 }
 
 /* Component is selected */
-.y-editor-builder .cmpCtn--active{
+.y-editor-builder .component-container--active{
     border-color: #18bc33;
 }
 
-.cmpCtn .button-container{
+.component-container .button-container{
     display: none;
     position: absolute;
     background: #fff;
@@ -38,34 +34,29 @@
     right:0;
 }
 
-/*wird nicht gebraucht*/
-.sk-top-nav{
-    z-index:2001;
-}
-
 .button-container:hover + .cmp-brandloch{
     display: block;
     z-index: 0;
     opacity: 1;
 }
 
-.cmpCtn:hover > .cmp-ghost{
+.component-container:hover > .ghost-component{
     display: block;
 }
 
-.cmpCtn .ghostflag{
+.component-container .ghostflag{
     border: none;
     padding: 20px 10px 22px;
     background: transparent !important;
 }
 
 /* Add a white background to siblings to proper hightlight stuff with transparent background */
-.cmpCtn:hover .cmpCtn,
-.cmpCtn:hover .y-dropzone{
+.component-container:hover .component-container,
+.component-container:hover .y-dropzone{
     background: #fff;
 }
 
-.cmp-ghost,
+.ghost-component,
 .cmp-brandloch{
     position: absolute;
     width: 100%;
@@ -82,18 +73,18 @@
     pointer-events: none;
 }
 
-.cmp-ghost:hover{
+.ghost-component:hover{
     opacity: 1;
 }
 
-.cmp-ghost:hover + .button-container,
+.ghost-component:hover + .button-container,
 .button-container:hover{
     display:block;
         z-index: 4000;
 }
 
-.cmp-btn__settings:hover,
-.cmp-btn__delete:hover{
+.component-btn-settings:hover,
+.component-btn-delete:hover{
     background:  #0486e0;
     color: #fff;
     transition: background .2s ease;
@@ -155,7 +146,7 @@
 }
 
 /* Styles for Preview mode */
-.y-editor-builder--preview .cmpCtn{
+.y-editor-builder--preview .component-container{
     border: none;
     margin: 0;
     padding: 0;
@@ -166,7 +157,7 @@
 }
 
 .y-editor-builder--preview .button-container,
-.y-editor-builder--preview .cmp-ghost{
+.y-editor-builder--preview .ghost-component{
     display: none!important;
 }
 
